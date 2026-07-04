@@ -3,16 +3,24 @@
 -- ============================================================
 
 -- F1: Returns TRUE/FALSE based on whether a student meets the minimum CPI for a job role
-CREATE OR REPLACE FUNCTION check_student_eligibility(student_id VARCHAR, job_role_id VARCHAR)
+CREATE FUNCTION check_student_eligibility(
+    p_student_id VARCHAR,
+    p_job_role_id VARCHAR
+)
 RETURNS BOOLEAN AS $$
 DECLARE
-    v_student_cpi NUMERIC(3, 2);
-    v_min_cpi NUMERIC(3, 2);
+    v_student_cpi NUMERIC(3,2);
+    v_min_cpi NUMERIC(3,2);
 BEGIN
-    SELECT s.CPI INTO v_student_cpi FROM Student s WHERE s.S_ID = student_id;
-    SELECT jrae.Min_CPI_Required INTO v_min_cpi
+    SELECT s.CPI
+    INTO v_student_cpi
+    FROM Student s
+    WHERE s.S_ID = p_student_id;
+
+    SELECT jrae.Min_CPI_Required
+    INTO v_min_cpi
     FROM Job_Role_Academic_Eligibility jrae
-    WHERE jrae.Job_Role_ID = job_role_id;
+    WHERE jrae.Job_Role_ID = p_job_role_id;
 
     IF v_min_cpi IS NULL OR v_student_cpi >= v_min_cpi THEN
         RETURN TRUE;
@@ -23,23 +31,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- F2: Returns the Resume_ID for the latest version uploaded by a student
-CREATE OR REPLACE FUNCTION get_latest_resume_id(student_id VARCHAR)
-RETURNS VARCHAR AS $$
-DECLARE
-    v_resume_id VARCHAR(10);
-BEGIN
-    SELECT Resume_ID INTO v_resume_id
-    FROM Student_Resume
-    WHERE S_ID = student_id
-    ORDER BY Version_Number DESC, Upload_Date DESC
-    LIMIT 1;
-    RETURN v_resume_id;
-END;
-$$ LANGUAGE plpgsql;
 
-
--- F3: Calculates the overall placement percentage for a given branch
+-- F2: Calculates the overall placement percentage for a given branch
 CREATE OR REPLACE FUNCTION calculate_placement_rate(branch_name VARCHAR)
 RETURNS NUMERIC AS $$
 DECLARE
@@ -50,7 +43,7 @@ BEGIN
 
     SELECT COUNT(DISTINCT s.S_ID) INTO v_placed_count
     FROM Student s
-    JOIN registers r ON s.S_ID = r.S_ID
+    JOIN register r ON s.S_ID = r.S_ID
     JOIN Application a ON r.Register_ID = a.Register_ID
     WHERE s.Branch = branch_name AND a.Application_Status = 'Selected';
 
@@ -63,8 +56,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- F4: Returns the average CTC/Stipend offered across all job roles in a specific drive
-CREATE OR REPLACE FUNCTION get_drive_avg_package(drive_id INT)
+-- F3: Returns the average CTC/Stipend offered across all job roles in a specific drive
+CREATE OR REPLACE FUNCTION get_drive_avg_package(drive_id VARCHAR)
 RETURNS NUMERIC AS $$
 DECLARE
     v_avg_ctc NUMERIC;
@@ -75,7 +68,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- F5: Returns the name of the primary mentor for a given student ID
+-- F4: Returns the name of the primary mentor for a given student ID
 CREATE OR REPLACE FUNCTION get_student_mentor_name(student_id VARCHAR)
 RETURNS VARCHAR AS $$
 DECLARE
@@ -113,6 +106,7 @@ BEGIN
 END;
 $$;
 
+
 -- P3: Marks all other applications as 'Rejected' for a student once one is 'Selected'
 CREATE OR REPLACE PROCEDURE process_application_selection(selected_app_id INT)
 LANGUAGE plpgsql AS $$
@@ -121,12 +115,12 @@ DECLARE
 BEGIN
     SELECT r.S_ID INTO v_s_id
     FROM Application a
-    JOIN registers r ON a.Register_ID = r.Register_ID
+    JOIN register r ON a.Register_ID = r.Register_ID
     WHERE a.Application_ID = selected_app_id;
 
     UPDATE Application
     SET Application_Status = 'Rejected'
-    WHERE Register_ID IN (SELECT Register_ID FROM registers WHERE S_ID = v_s_id)
+    WHERE Register_ID IN (SELECT Register_ID FROM register WHERE S_ID = v_s_id)
       AND Application_Status != 'Selected'
       AND Application_ID != selected_app_id;
 END;
@@ -154,7 +148,7 @@ BEGIN
     SET Status = 'Placed'
     WHERE S_ID = student_id AND EXISTS (
         SELECT 1 FROM Application a
-        JOIN registers r ON a.Register_ID = r.Register_ID
+        JOIN register r ON a.Register_ID = r.Register_ID
         WHERE r.S_ID = student_id AND a.Application_Status = 'Selected'
     );
 END;

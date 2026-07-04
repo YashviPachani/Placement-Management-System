@@ -28,24 +28,13 @@ every determinant is a candidate key, eliminating redundancy and update anomalie
 
 | Table | Primary Key | Resolves M:N Between |
 |---|---|---|
-| registers | Register_ID | Student ↔ Drive |
+| register | Register_ID | Student ↔ Drive |
 | Application | Application_ID | registers ↔ Job_Role |
 | Student_Round_Result | Result_ID | Application ↔ Selection_Round |
 | Company_Assigned | (C_ID, PC_ID) | Company ↔ Placement_Coordinators |
 | Mentor_Student | (Mentor_ID, S_ID) | Mentors ↔ Student |
 | Student_Training | (S_ID, Training_ID) | Student ↔ Training |
 
-## Multi-valued Attribute Tables
-
-These exist because a Job_Role can require multiple skills, support multiple
-locations, and have different CPI cutoffs per branch — storing these as
-comma-separated values in Job_Role would violate 1NF.
-
-| Table | Primary Key |
-|---|---|
-| Job_Role_Academic_Eligibility | (Job_Role_ID, Branch_name) |
-| Job_Role_Skill_Requirement | (Job_Role_ID, Skill_Name) |
-| Job_Role_Location | (Job_Role_ID, Location) |
 
 ## Why this matters for the placement use case
 

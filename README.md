@@ -31,17 +31,19 @@ manual tracking with a single, normalized, secure source of truth.
 ```
 placement-management-system/
 ├── README.md
+│   
 ├── docs/
 │   ├── SRS.pdf                     # Full Software Requirements Specification
 │   ├── ER_diagram.png              # Conceptual ER diagram
-│   ├── ER_diagram_normalized.png   # Final ER diagram after normalization
 │   └── normalization_notes.md      # Table-by-table BCNF justification
 └── sql/
     ├── 01_schema.sql               # All CREATE TABLE statements
     ├── 02_triggers.sql             # Trigger functions
     ├── 03_functions_and_procedures.sql
-    └── 04_queries.sql              # 35+ analytical queries
+    ├── 04_queries.sql              # 35+ analytical queries
+    └── 05_Insert statements.txt
 ```
+## ER model link :[ER Diagram](https://drive.google.com/file/d/1yk1_iZtKsKbquvMNg-e2mbpIvATtpFff/view?usp=sharing) 
 
 ## Problem It Solves
 Most university placement offices manage data through spreadsheets, emails, and paper
@@ -50,15 +52,6 @@ control, and risk of data loss during crashes. This project addresses each of th
 through normalization, role-based access control, transaction-safe design, and
 structured reporting (built with NAAC/NIRF accreditation reporting needs in mind).
 
-## Status
-- [x] Requirements gathering (interviews, questionnaire, background research)
-- [x] ER modeling and normalization (BCNF)
-- [x] DDL schema design
-- [x] Triggers, functions, procedures
-- [x] Analytical queries
-- [ ] Schema validation / runnable end-to-end (in progress)
-- [ ] Sample data set
-- [ ] Frontend / UI
 
 ## Contributors
 - Trisha Godhasara (202403046)

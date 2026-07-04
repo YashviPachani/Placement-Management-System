@@ -30,6 +30,7 @@ SELECT S_ID, Current_Job_Title FROM Alumni WHERE Current_Company = 'Google';
 -- Q6: Students who graduated in 2024
 SELECT S_Name, Branch, Graduation_Year FROM Student WHERE Graduation_Year = 2024;
 
+--CHECK THIS ONE
 -- Q7: Companies in the 'Technology' industry
 SELECT C_Name, Website, Location FROM Company WHERE Industry_Type = 'Technology';
 
@@ -80,10 +81,12 @@ FROM Job_Role jr
 JOIN Job_Role_Academic_Eligibility jrae ON jr.Job_Role_ID = jrae.Job_Role_ID;
 
 -- Q15: Students, their resumes, and applications
-SELECT s.S_Name, s.Branch, sr.Resume_ID, a.Application_Status
+SELECT s.S_Name,s.Branch,sr.resume_id,a.Application_Status
 FROM Student s
-JOIN Student_Resume sr ON s.S_ID = sr.S_ID
-JOIN Application a ON sr.Resume_ID = a.Resume_ID;
+JOIN Student_Resume sr
+    ON s.S_ID = sr.student_id
+JOIN Application a
+    ON sr.resume_id = a.Resume_ID;
 
 -- Q16: Companies assigned to placement coordinators
 SELECT c.C_Name, pc.PC_ID, pc.Role
@@ -100,7 +103,7 @@ JOIN Drive d ON jr.Drive_ID = d.Drive_ID;
 -- Q18: Students who registered for drives but are not interested
 SELECT s.S_Name, r.Reason_If_Not_Interested
 FROM Student s
-JOIN registers r ON s.S_ID = r.S_ID
+JOIN register r ON s.S_ID = r.S_ID
 WHERE r.Is_Interested = FALSE;
 
 -- Q19: Job roles with their required skills and locations
@@ -120,7 +123,7 @@ WHERE s.CPI >= jrae.Min_CPI_Required;
 -- Q21: Students with latest resume version who applied for jobs
 SELECT s.S_Name, sr.Resume_ID, sr.Version_Number, jr.Job_Role_ID, a.Application_Status
 FROM Student s
-JOIN Student_Resume sr ON s.S_ID = sr.S_ID
+JOIN Student_Resume sr ON s.S_ID = sr.student_id
 JOIN Application a ON sr.Resume_ID = a.Resume_ID
 JOIN Job_Role jr ON a.Job_Role_ID = jr.Job_Role_ID
 WHERE sr.Version_Number = (
@@ -130,7 +133,7 @@ WHERE sr.Version_Number = (
 -- Q22: Students who registered but didn't apply to any job
 SELECT s.S_Name, s.Branch, r.Registration_Date, d.Drive_ID
 FROM Student s
-JOIN registers r ON s.S_ID = r.S_ID
+JOIN register r ON s.S_ID = r.S_ID
 JOIN Drive d ON r.Drive_ID = d.Drive_ID
 LEFT JOIN Application a ON r.Register_ID = a.Register_ID
 WHERE a.Application_ID IS NULL;
@@ -140,7 +143,7 @@ SELECT s.S_Name, s.Branch, s.CPI, c.C_Name, jr.Job_Role_ID,
        jrae.Min_CPI_Required, a.Application_Status,
        CASE WHEN s.CPI >= jrae.Min_CPI_Required THEN 'Eligible' ELSE 'Not Eligible' END AS Eligibility_Status
 FROM Application a
-JOIN registers r ON a.Register_ID = r.Register_ID
+JOIN register r ON a.Register_ID = r.Register_ID
 JOIN Student s ON r.S_ID = s.S_ID
 JOIN Job_Role jr ON a.Job_Role_ID = jr.Job_Role_ID
 JOIN Company c ON jr.C_ID = c.C_ID
@@ -177,7 +180,7 @@ WITH StudentApplications AS (
            COUNT(CASE WHEN a.Application_Status = 'Selected' THEN 1 END) AS Selected_Apps,
            COUNT(CASE WHEN a.Application_Status = 'Interviewed' THEN 1 END) AS Interview_Apps
     FROM Student s
-    JOIN registers r ON s.S_ID = r.S_ID
+    JOIN register r ON s.S_ID = r.S_ID
     JOIN Application a ON r.Register_ID = a.Register_ID
     GROUP BY s.S_ID, s.S_Name, s.Branch, s.CPI
 )
@@ -195,7 +198,7 @@ SELECT s.Branch,
        ROUND(100.0 * COUNT(DISTINCT CASE WHEN a.Application_Status = 'Selected' THEN s.S_ID END) /
              COUNT(DISTINCT s.S_ID), 2) AS Placement_Percentage
 FROM Student s
-LEFT JOIN registers r ON s.S_ID = r.S_ID
+LEFT JOIN register r ON s.S_ID = r.S_ID
 LEFT JOIN Application a ON r.Register_ID = a.Register_ID
 GROUP BY s.Branch
 ORDER BY Placement_Percentage DESC;
@@ -212,7 +215,7 @@ WITH StudentSelections AS (
     SELECT s.S_ID, s.S_Name, s.Branch, jr.Job_Role_ID, c.C_Name, jr.Avg_CTC_or_Stipend,
            ROW_NUMBER() OVER (PARTITION BY s.S_ID ORDER BY jr.Avg_CTC_or_Stipend DESC) AS selection_rank
     FROM Student s
-    JOIN registers r ON s.S_ID = r.S_ID
+    JOIN register r ON s.S_ID = r.S_ID
     JOIN Application a ON r.Register_ID = a.Register_ID
     JOIN Job_Role jr ON a.Job_Role_ID = jr.Job_Role_ID
     JOIN Company c ON jr.C_ID = c.C_ID
@@ -235,7 +238,7 @@ WITH StudentPlacements AS (
            AVG(jr.Avg_CTC_or_Stipend) AS Avg_Offered_Package,
            COUNT(DISTINCT a.Application_ID) AS Applications
     FROM Student s
-    JOIN registers r ON s.S_ID = r.S_ID
+    JOIN register r ON s.S_ID = r.S_ID
     JOIN Application a ON r.Register_ID = a.Register_ID
     JOIN Job_Role jr ON a.Job_Role_ID = jr.Job_Role_ID
     WHERE a.Application_Status = 'Selected'
@@ -266,7 +269,7 @@ WITH branch_stats AS (
         MAX(jr.Avg_CTC_or_Stipend) AS highest_package,
         COUNT(DISTINCT jr.C_ID) AS companies_interested
     FROM Student s
-    LEFT JOIN registers r ON s.S_ID = r.S_ID
+    LEFT JOIN register r ON s.S_ID = r.S_ID
     LEFT JOIN Application a ON r.Register_ID = a.Register_ID
     LEFT JOIN Job_Role jr ON a.Job_Role_ID = jr.Job_Role_ID
     WHERE s.Status = 'Active'
