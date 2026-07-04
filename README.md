@@ -1,4 +1,4 @@
-# University Placement Management System (DBMS Project)
+#Placement Management System (DBMS Project)
 
 A relational database system designed to centralize and manage the entire university
 placement process — student records, company profiles, placement drives, job roles,
