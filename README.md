@@ -2,7 +2,7 @@
 
 A fully normalized **PostgreSQL database system** for managing end-to-end campus placement operations — student registrations, company drives, job applications, multi-round selection tracking, offer letters, mentorship, and training programs.
 
-This project focuses on **database design excellence**: 23 BCNF-normalized tables, business-logic-enforcing triggers, reusable functions & stored procedures, and 31 analytical queries ranging from basic filters to window-function-powered rankings.
+This project focuses on **database design excellence**: 23 BCNF-normalized tables, business-logic-enforcing triggers, reusable functions & stored procedures, and  analytical queries ranging from basic filters to window-function-powered rankings.
 
 ![Language](https://img.shields.io/badge/Language-PL%2FpgSQL-336791?logo=postgresql&logoColor=white)
 ![Database](https://img.shields.io/badge/Database-PostgreSQL-4169E1?logo=postgresql&logoColor=white)
@@ -29,7 +29,7 @@ Placement-Management-System/
 │   ├── 01_schema.sql                     # DDL — all 23 tables, keys, constraints
 │   ├── 02_triggers.sql                   # Automated business-rule enforcement
 │   ├── 03_functions_and_procedures.sql   # Reusable PL/pgSQL logic
-│   ├── 04_queries.sql                    # 31 analytical queries (basic → advanced)
+│   ├── 04_queries.sql                    # analytical queries (basic → advanced)
 │   └── 05_Insert statements.txt          # Sample seed data
 └── README.md
 ```
@@ -45,7 +45,8 @@ The schema spans **23 tables** across three categories:
 | Category | Tables |
 |---|---|
 | **Core entities** | `Student`, `Company`, `Drive`, `Job_Role`, `Mentors`, `Training` |
-| **Dependent / weak entities** | `Student_Phone`, `Alumni`, `Placement_Coordinators`, `Drive_log`, `Drive_Eligibility` |
+| **Dependent / weak entities** | `Student_Phone`, `Student_Resume`, `Alumni`, `Offer_Letter`, `Placement_Coordinators`, `Drive_log`, `Drive_Eligibility` |
+| **Job role qualifiers** | `Job_Role_Academic_Eligibility`, `Job_Role_Skill_Requirement`, `Job_Role_Location`, `Selection_Round` |
 | **Relationship (M:N) tables** | `register`, `Application`, `Student_Round_Result`, `Company_Assigned`, `Mentor_Student`, `Student_Training` |
 
 Every table is normalized to **BCNF** — see [`docs/normalization_notes.md`](docs/normalization_notes.md) for the full per-table justification and why it matters for this domain (e.g., updating a student's CPI touches exactly one row; deleting a drive cleanly cascades to its job roles and eligibility rows).
@@ -122,7 +123,9 @@ Every table is normalized to **BCNF** — see [`docs/normalization_notes.md`](do
 - **[Normalization Notes](docs/normalization_notes.md)** — BCNF proof, table by table
 - **[ER Diagram](docs/ER_diagram.png)** — visual schema reference
 
-## 👤 Author
-**Trisha Godhasara**
-**Yashvi Pachani**
 
+👤 Authors
+
+Trisha Godhasara
+
+Yashvi Pachani
