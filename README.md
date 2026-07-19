@@ -122,15 +122,7 @@ Every table is normalized to **BCNF** — see [`docs/normalization_notes.md`](do
 - **[Normalization Notes](docs/normalization_notes.md)** — BCNF proof, table by table
 - **[ER Diagram](docs/ER_diagram.png)** — visual schema reference
 
-## 🤝 Contributing
-
-Contributions, issues, and suggestions are welcome! Feel free to open an issue or submit a pull request.
-
-## 📜 License
-
-No license has been specified for this repository yet. Consider adding one (e.g., [MIT](https://choosealicense.com/licenses/mit/)) if you'd like others to freely use or contribute to this project.
-
 ## 👤 Author
-
+**Trisha Godhasara**
 **Yashvi Pachani**
-[GitHub](https://github.com/YashviPachani)
+
